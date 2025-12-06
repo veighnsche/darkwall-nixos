@@ -1,5 +1,14 @@
-# Custom Windsurf package - maintained by darkwall
-# Based on nixpkgs vscode derivation pattern
+# TEAM_427: darkwall-windsurf - Windsurf IDE with darkwall customizations
+#
+# Structure:
+#   packages/darkwall-windsurf/
+#   ├── default.nix      # Entry point (calls this file)
+#   ├── package.nix      # Package derivation (this file)
+#   └── dotfiles/        # Customizations to install
+#       ├── mcp_config.json
+#       ├── global_rules.md
+#       └── workflows/
+#
 { lib
 , stdenv
 , fetchurl
@@ -7,6 +16,8 @@
 , makeDesktopItem
 , copyDesktopItems
 , wrapGAppsHook3
+, autoPatchelfHook
+# Runtime dependencies
 , libsecret
 , libXScrnSaver
 , libxshmfence
@@ -44,7 +55,6 @@
 , vulkan-loader
 , xorg
 , krb5
-, autoPatchelfHook
 }:
 
 let
@@ -56,20 +66,21 @@ let
     sha256 = "sha256-zjbshpfKfJdoZ4uZubizZNM6BEr+0kKTH+oU9URYHGg=";
   };
 
+
   desktopItem = makeDesktopItem {
-    name = "windsurf";
-    desktopName = "Windsurf";
-    comment = "Code Editing. Redefined.";
+    name = "darkwall-windsurf";
+    desktopName = "Windsurf (darkwall)";
+    comment = "Code Editing. Redefined. With darkwall customizations.";
     genericName = "Text Editor";
-    exec = "windsurf %F";
+    exec = "darkwall-windsurf %F";
     icon = "windsurf";
     startupNotify = true;
     startupWMClass = "Windsurf";
     categories = [ "Utility" "TextEditor" "Development" "IDE" ];
-    keywords = [ "vscode" ];
+    keywords = [ "vscode" "windsurf" "darkwall" ];
     actions.new-empty-window = {
       name = "New Empty Window";
-      exec = "windsurf --new-window %F";
+      exec = "darkwall-windsurf --new-window %F";
       icon = "windsurf";
     };
     mimeTypes = [
@@ -80,11 +91,11 @@ let
   };
 
   urlHandlerDesktopItem = makeDesktopItem {
-    name = "windsurf-url-handler";
-    desktopName = "Windsurf - URL Handler";
+    name = "darkwall-windsurf-url-handler";
+    desktopName = "Windsurf (darkwall) - URL Handler";
     comment = "Code Editing. Redefined.";
     genericName = "Text Editor";
-    exec = "windsurf --open-url %U";
+    exec = "darkwall-windsurf --open-url %U";
     icon = "windsurf";
     startupNotify = true;
     startupWMClass = "Windsurf";
@@ -134,7 +145,7 @@ let
   ];
 
 in stdenv.mkDerivation {
-  pname = "windsurf";
+  pname = "darkwall-windsurf";
   inherit version src;
 
   sourceRoot = ".";
@@ -155,21 +166,24 @@ in stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
+    # Install Windsurf
     mkdir -p $out/lib/windsurf $out/bin
     cp -r Windsurf/* $out/lib/windsurf/
 
-    # Create wrapper
-    makeWrapper $out/lib/windsurf/windsurf $out/bin/windsurf \
+
+    # Create wrapper with LD_LIBRARY_PATH
+    makeWrapper $out/lib/windsurf/windsurf $out/bin/darkwall-windsurf \
       --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath runtimeDeps} \
       "''${gappsWrapperArgs[@]}"
+
+    # Also provide plain 'windsurf' symlink
+    ln -s $out/bin/darkwall-windsurf $out/bin/windsurf
 
     # Install icons
     for size in 16 32 48 64 128 256 512; do
       install -Dm644 $out/lib/windsurf/resources/app/resources/linux/code.png \
         $out/share/icons/hicolor/''${size}x''${size}/apps/windsurf.png || true
     done
-
-    # Fallback icon
     install -Dm644 $out/lib/windsurf/resources/app/resources/linux/code.png \
       $out/share/pixmaps/windsurf.png || true
 
@@ -182,10 +196,10 @@ in stdenv.mkDerivation {
   ];
 
   meta = with lib; {
-    description = "Codeium's AI-powered IDE based on VS Code";
+    description = "Windsurf IDE (binary only - darkwall customizations via home-manager)";
     homepage = "https://codeium.com/windsurf";
     license = licenses.unfree;
     platforms = [ "x86_64-linux" ];
-    mainProgram = "windsurf";
+    mainProgram = "darkwall-windsurf";
   };
 }

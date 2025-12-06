@@ -1,17 +1,13 @@
-# TEAM_426: Vince's Home Manager configuration (NixOS integrated)
+# TEAM_427: Vince's Home Manager configuration (NixOS integrated)
 # Extends common/ with power-user tools and dev environment
-{ config, pkgs, lib, flakePath, ... }:
+{ config, pkgs, lib, ... }:
 
-let
-  mkWindsurfSymlink = path: {
-    source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/dotfiles/windsurf/${path}";
-  };
-in
 {
   imports = [
     ../common           # Inherit all base config (KDE apps, essentials)
     ./shell.nix         # Power-user shell (zsh, starship)
     ./programs.nix      # Git, dev tools config
+    ./windsurf          # Windsurf IDE + dotfiles symlinks
   ];
 
   # ════════════════════════════════════════════════════════════════
@@ -52,19 +48,7 @@ in
     nodejs_22
     uv            # fast Python package manager
     git           # version control (for CLI use)
-
-    # Code editors
-    darkwall-windsurf
   ];
-
-  # ════════════════════════════════════════════════════════════════
-  # Windsurf Configuration
-  # ════════════════════════════════════════════════════════════════
-  home.file = {
-    ".codeium/windsurf/mcp_config.json" = mkWindsurfSymlink "mcp_config.json";
-    ".codeium/windsurf/memories/global_rules.md" = mkWindsurfSymlink "global_rules.md";
-    ".codeium/windsurf/global_workflows" = mkWindsurfSymlink "workflows";
-  };
 
   # Override konsole profile from common/
   programs.konsole.profiles."Default".command = "${pkgs.zsh}/bin/zsh";

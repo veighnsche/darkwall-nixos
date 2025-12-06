@@ -1,4 +1,4 @@
-# TEAM_426: NixOS + Home Manager flake configuration
+# TEAM_427: NixOS + Home Manager flake configuration
 # Architecture based on https://nixos-and-flakes.thiscute.world/
 {
   description = "darkwall NixOS configuration";
@@ -24,17 +24,17 @@
   outputs = { self, nixpkgs, home-manager, plasma-manager, ... }@inputs:
     let
       system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
 
       # Custom packages overlay
       darkwallOverlay = final: prev: {
-        darkwall-windsurf = final.callPackage ./packages/windsurf.nix { };
+        darkwall-windsurf = final.callPackage ./packages/darkwall-windsurf { };
       };
 
       # Shared module args passed to all modules
       specialArgs = {
-        inherit inputs;
-        # Path to this flake for dotfile symlinks
-        flakePath = "/home/vince/Projects/darkwall-nixos";
+        inherit inputs self;
+        flakePath = builtins.toString self.outPath;  # Portable path to flake root
       };
 
       # Shared NixOS modules for all hosts
@@ -91,14 +91,28 @@
             config.allowUnfree = true;
             overlays = [ darkwallOverlay ];
           };
-          extraSpecialArgs = specialArgs // {
-            configDir = "/home/vince/.config/nix-home-manager";
-          };
+          extraSpecialArgs = specialArgs;
           modules = [
             plasma-manager.homeModules.plasma-manager
             ./home/vince/standalone.nix
           ];
         };
       };
+
+      # ════════════════════════════════════════════════════════════════
+      # Development Shell (for contributors)
+      # ════════════════════════════════════════════════════════════════
+      devShells.${system}.default = pkgs.mkShell {
+        packages = with pkgs; [
+          nixfmt-rfc-style  # Nix formatter
+          nil               # Nix LSP
+          just              # Command runner
+        ];
+      };
+
+      # ════════════════════════════════════════════════════════════════
+      # Formatter (nix fmt)
+      # ════════════════════════════════════════════════════════════════
+      formatter.${system} = pkgs.nixfmt-rfc-style;
     };
 }
