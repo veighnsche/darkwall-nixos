@@ -72,13 +72,27 @@
           ];
         };
 
-        # Future: real hardware
-        # darkwall = nixpkgs.lib.nixosSystem {
-        #   inherit system specialArgs;
-        #   modules = sharedModules ++ [
-        #     ./hosts/darkwall
-        #   ];
-        # };
+        # TEAM_434: Daily driver desktop (dual-boot with Fedora)
+        blep = nixpkgs.lib.nixosSystem {
+          inherit system specialArgs;
+          modules = sharedModules ++ [
+            ./hosts/blep
+          ];
+        };
+
+        # TEAM_434: Headless GPU server (ComfyUI, service accounts only)
+        workstation = nixpkgs.lib.nixosSystem {
+          inherit system specialArgs;
+          modules = [
+            # Server doesn't need desktop modules or home-manager users
+            home-manager.nixosModules.home-manager
+            {
+              nixpkgs.overlays = [ darkwallOverlay ];
+            }
+            ./modules/system
+            ./hosts/workstation
+          ];
+        };
       };
 
       # ════════════════════════════════════════════════════════════════
