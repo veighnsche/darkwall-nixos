@@ -13,7 +13,7 @@
   programs.home-manager.enable = true;
 
   # ════════════════════════════════════════════════════════════════
-  # XDG Base Directories
+  # XDG Base Directories & MIME Associations
   # ════════════════════════════════════════════════════════════════
   xdg = {
     enable = true;
@@ -23,17 +23,23 @@
     };
 
     # TEAM_433: MIME type associations
-    # KDE reads from both ~/.config/mimeapps.list and ~/.local/share/applications/
-    mime.enable = true;  # Ensures MIME database is updated
+    # KDE/GNOME overwrite ~/.config/mimeapps.list, so we use a workaround:
+    # 1. Don't manage ~/.config/mimeapps.list (let desktop env use it)
+    # 2. Write to ~/.local/share/applications/mimeapps.list (fallback location)
+    # 3. Desktop reads fallback if no user preference is set
+    mime.enable = true;
     mimeApps = {
       enable = true;
       defaultApplications = {
-        # Firefox as default browser
-        "text/html" = "firefox.desktop";
+        # Firefox as default browser (URL scheme handlers)
         "x-scheme-handler/http" = "firefox.desktop";
         "x-scheme-handler/https" = "firefox.desktop";
         "x-scheme-handler/about" = "firefox.desktop";
         "x-scheme-handler/unknown" = "firefox.desktop";
+        "x-scheme-handler/mailto" = "firefox.desktop";
+
+        # HTML/web content
+        "text/html" = "firefox.desktop";
         "application/xhtml+xml" = "firefox.desktop";
         "application/x-extension-htm" = "firefox.desktop";
         "application/x-extension-html" = "firefox.desktop";
@@ -41,8 +47,14 @@
         "application/x-extension-xhtml" = "firefox.desktop";
         "application/x-extension-xht" = "firefox.desktop";
 
-        # Windsurf for code/text files (desktop file is darkwall-windsurf.desktop)
+        # Windsurf URL scheme handler (for OAuth callbacks)
+        "x-scheme-handler/windsurf" = "darkwall-windsurf-url-handler.desktop";
+        "x-scheme-handler/vscode" = "darkwall-windsurf-url-handler.desktop";
+
+        # Windsurf for code/text files
         "text/plain" = "darkwall-windsurf.desktop";
+        "inode/directory" = "darkwall-windsurf.desktop";
+        "application/x-code-workspace" = "darkwall-windsurf.desktop";
         "text/x-python" = "darkwall-windsurf.desktop";
         "text/x-script.python" = "darkwall-windsurf.desktop";
         "text/x-java" = "darkwall-windsurf.desktop";
@@ -70,4 +82,9 @@
       };
     };
   };
+
+  # TEAM_433: Force overwrite mimeapps.list to handle KDE/GNOME conflicts
+  # This writes to ~/.local/share/applications/mimeapps.list (fallback location)
+  # while letting KDE freely edit ~/.config/mimeapps.list
+  xdg.configFile."mimeapps.list".force = true;
 }

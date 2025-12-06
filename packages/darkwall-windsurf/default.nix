@@ -90,6 +90,7 @@ let
     ];
   };
 
+  # TEAM_433: URL handler for OAuth callbacks (windsurf:// and vscode:// schemes)
   urlHandlerDesktopItem = makeDesktopItem {
     name = "darkwall-windsurf-url-handler";
     desktopName = "Windsurf (darkwall) - URL Handler";
@@ -100,7 +101,10 @@ let
     startupNotify = true;
     startupWMClass = "Windsurf";
     categories = [ "Utility" "TextEditor" "Development" "IDE" ];
-    mimeTypes = [ "x-scheme-handler/windsurf" ];
+    mimeTypes = [
+      "x-scheme-handler/windsurf"
+      "x-scheme-handler/vscode"  # Many OAuth services use vscode:// protocol
+    ];
     noDisplay = true;
   };
 

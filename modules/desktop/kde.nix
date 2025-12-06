@@ -1,4 +1,4 @@
-# TEAM_426: KDE Plasma desktop configuration
+# TEAM_433: KDE Plasma desktop configuration
 { config, lib, pkgs, ... }:
 
 {
@@ -47,14 +47,39 @@
     kdePackages.breeze
     kdePackages.breeze-gtk
     kdePackages.breeze-icons
+
+    # TEAM_433: XDG utilities for MIME/URL handling
+    xdg-utils
   ];
 
   # GTK integration for KDE
   programs.dconf.enable = true;
 
-  # XDG portal for Wayland screen sharing, etc.
+  # ════════════════════════════════════════════════════════════════
+  # TEAM_433: XDG Portal & Default Browser Configuration
+  # Electron apps use BROWSER env var and xdg-open for opening URLs
+  # ════════════════════════════════════════════════════════════════
+
+  # XDG portal for Wayland screen sharing, file dialogs, etc.
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
+    # TEAM_433: Don't use portal for xdg-open - it's broken on KDE
+    # The traditional xdg-open + BROWSER env var works better
+    xdgOpenUsePortal = false;
+  };
+
+  # Enable system-wide MIME type handling
+  xdg.mime.enable = true;
+  xdg.mime.defaultApplications = {
+    "x-scheme-handler/http" = "firefox.desktop";
+    "x-scheme-handler/https" = "firefox.desktop";
+    "text/html" = "firefox.desktop";
+  };
+
+  # BROWSER environment variable - Electron apps check this!
+  environment.sessionVariables = {
+    BROWSER = "firefox";
+    DEFAULT_BROWSER = "firefox";
   };
 }
