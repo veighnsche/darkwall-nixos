@@ -1,14 +1,13 @@
-# TEAM_427: Vince's Home Manager configuration for STANDALONE use (non-NixOS)
+# TEAM_433: Vince's Home Manager configuration for STANDALONE use (non-NixOS)
 # This file is used when running home-manager on Fedora/other distros
-# Note: On Fedora, KDE apps are already installed system-wide, so we skip common/kde-apps
+# Imports common/base.nix (shared config) but skips KDE apps (Fedora has them)
 { config, pkgs, lib, ... }:
 
 {
   imports = [
-    ../common/shell-base.nix  # Just the shell basics (Fedora has KDE apps)
-    ./shell.nix               # Power-user shell (zsh, starship)
-    ./programs.nix            # Git, dev tools config
-    ./windsurf.nix            # Windsurf IDE + dotfiles symlinks
+    ../common/base.nix  # Shared: XDG, mimeApps, darkwall-windsurf, shell-base
+    ./shell.nix         # Power-user shell (zsh, starship)
+    ./programs.nix      # Git, dev tools config
   ];
 
   # ════════════════════════════════════════════════════════════════
@@ -17,9 +16,6 @@
   home.username = "vince";
   home.homeDirectory = "/home/vince";
   home.stateVersion = "25.11";
-
-  # Let Home Manager manage itself
-  programs.home-manager.enable = true;
 
   # ════════════════════════════════════════════════════════════════
   # Non-NixOS Integration
@@ -66,15 +62,4 @@
     uv
     git
   ];
-
-  # ════════════════════════════════════════════════════════════════
-  # XDG Base Directories
-  # ════════════════════════════════════════════════════════════════
-  xdg = {
-    enable = true;
-    userDirs = {
-      enable = true;
-      createDirectories = true;
-    };
-  };
 }

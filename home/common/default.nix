@@ -1,24 +1,11 @@
-# TEAM_426: Common/base Home Manager configuration
-# All users inherit from this - contains KDE defaults and essentials
+# TEAM_433: NixOS Home Manager configuration
+# Imports base (shared) + KDE apps (NixOS-specific)
+# For Fedora/standalone, use base.nix directly (skips KDE apps)
 { config, pkgs, lib, ... }:
 
 {
   imports = [
-    ./kde-apps.nix
-    ./shell-base.nix
+    ./base.nix      # Shared: XDG, mimeApps, darkwall-windsurf, shell-base
+    ./kde-apps.nix  # NixOS only: KDE applications
   ];
-
-  # Let Home Manager manage itself
-  programs.home-manager.enable = true;
-
-  # ════════════════════════════════════════════════════════════════
-  # XDG Base Directories
-  # ════════════════════════════════════════════════════════════════
-  xdg = {
-    enable = true;
-    userDirs = {
-      enable = true;
-      createDirectories = true;
-    };
-  };
 }

@@ -14,6 +14,13 @@
   # VM-specific settings
   # ════════════════════════════════════════════════════════════════
 
+  # VM resource configuration
+  virtualisation.vmVariant.virtualisation = {
+    cores = 8;
+    memorySize = 16 * 1024;  # 16GB in MB
+    diskSize = 50 * 1024;    # 50GB in MB
+  };
+
   # Enable QEMU guest agent
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;

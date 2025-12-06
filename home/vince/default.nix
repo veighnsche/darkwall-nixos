@@ -7,7 +7,6 @@
     ../common           # Inherit all base config (KDE apps, essentials)
     ./shell.nix         # Power-user shell (zsh, starship)
     ./programs.nix      # Git, dev tools config
-    ./windsurf          # Windsurf IDE + dotfiles symlinks
   ];
 
   # ════════════════════════════════════════════════════════════════

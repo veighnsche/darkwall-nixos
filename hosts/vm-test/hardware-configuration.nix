@@ -19,6 +19,7 @@
   # VM hardware
   hardware.enableRedistributableFirmware = lib.mkDefault true;
 
-  # Network interface (virtio)
-  networking.interfaces.enp1s0.useDHCP = lib.mkDefault true;
+  # TEAM_432: Removed networking.interfaces.enp1s0.useDHCP
+  # NetworkManager (enabled in modules/system/networking.nix) handles DHCP.
+  # Having both causes a timeout waiting for /sys/subsystem/net/devices/enp1s0
 }
