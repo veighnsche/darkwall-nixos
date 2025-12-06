@@ -20,16 +20,14 @@
   boot.extraModulePackages = [ ];
 
   # ════════════════════════════════════════════════════════════════
-  # Filesystem Layout (Dual-boot with Fedora)
+  # TEAM_437: Filesystem Layout (Dual-boot with Fedora)
   # ════════════════════════════════════════════════════════════════
-  # Current layout (all Fedora):
-  #   nvme0n1p1: 600M EFI  (shared between NixOS and Fedora)
-  #   nvme0n1p2: 2G   /boot (Fedora)
-  #   nvme0n1p3: 929G btrfs (Fedora root + home)
-  #
-  # TODO: For dual-boot, shrink nvme0n1p3 and create:
-  #   nvme0n1p4: ~400G ext4 (NixOS root)
-  #   nvme0n1p5: ~16G  swap (NixOS swap)
+  # Target layout:
+  #   nvme0n1p1: 600M  EFI   (shared between NixOS and Fedora)
+  #   nvme0n1p2: 2G    /boot (Fedora only)
+  #   nvme0n1p3: 100G  btrfs (Fedora root + home)
+  #   nvme0n1p4: 815G  ext4  (NixOS root)
+  #   nvme0n1p5: 16G   swap  (NixOS swap)
   # ════════════════════════════════════════════════════════════════
 
   # NixOS root - UPDATE after partitioning
