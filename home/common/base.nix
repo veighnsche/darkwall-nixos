@@ -22,7 +22,9 @@
       createDirectories = true;
     };
 
-    # TEAM_432: MIME type associations
+    # TEAM_433: MIME type associations
+    # KDE reads from both ~/.config/mimeapps.list and ~/.local/share/applications/
+    mime.enable = true;  # Ensures MIME database is updated
     mimeApps = {
       enable = true;
       defaultApplications = {

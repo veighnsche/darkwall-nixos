@@ -53,11 +53,11 @@ iso:
 
 # Apply home-manager configuration (standalone)
 home:
-    home-manager switch --flake .#vince@fedora
+    home-manager switch --flake .#vince@fedora -b backup
 
 # Apply home-manager with debug output
 home-debug:
-    home-manager switch --flake .#vince@fedora --show-trace
+    home-manager switch --flake .#vince@fedora -b backup --show-trace
 
 # Build home-manager without switching
 home-build:
