@@ -8,13 +8,15 @@ require {
     class fifo_file { create open read write unlink getattr };
     class dir { add_name remove_name write read };
     class lnk_file { read getattr };
-    class file { read write create unlink getattr open };
+    # TEAM_444: Added link permission for fc-cache atomic cache file replacement
+    class file { read write create unlink getattr open link };
 }
 
 # Allow init_t (nix sandbox) to work with fifo files in default_t context
 allow init_t default_t:fifo_file { create open read write unlink getattr };
 allow init_t default_t:dir { add_name remove_name write read };
-allow init_t default_t:file { read write create unlink getattr open };
+# TEAM_444: Added link for fc-cache atomic cache operations
+allow init_t default_t:file { read write create unlink getattr open link };
 
 # Allow reading user home symlinks
 allow init_t user_home_t:lnk_file { read getattr };

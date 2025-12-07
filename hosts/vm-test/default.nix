@@ -28,6 +28,14 @@
       "-device virtio-vga-gl"
       "-display gtk,gl=on"
     ];
+    # TEAM_445: Share flake directory so mkOutOfStoreSymlink dotfiles resolve
+    # This mounts the host flake repo into the VM at the same path
+    sharedDirectories = {
+      flake-repo = {
+        source = "/home/vince/Projects/darkwall-nixos";
+        target = "/home/vince/Projects/darkwall-nixos";
+      };
+    };
   };
 
   # Enable QEMU guest agent
