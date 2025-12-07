@@ -1,6 +1,9 @@
 # TEAM_433: Vince's Home Manager configuration for STANDALONE use (non-NixOS)
 # This file is used when running home-manager on Fedora/other distros
 # Imports common/base.nix (shared config) but skips KDE apps (Fedora has them)
+#
+# TEAM_443: SELinux setup required for Fedora - run ONCE:
+#   sudo semodule -i scripts/fedora/nix-sandbox.pp
 { config, pkgs, lib, ... }:
 
 {

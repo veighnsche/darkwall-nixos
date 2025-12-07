@@ -1,0 +1,46 @@
+
+module nix-daemon 1.0;
+
+require {
+	type snapperd_data_t;
+	type ptmx_t;
+	type init_t;
+	type devpts_t;
+	type http_port_t;
+	type kvm_device_t;
+	type default_t;
+	class file { create execute execute_no_trans lock map open read rename setattr unlink write };
+	class lnk_file { create rename setattr unlink };
+	class dir { add_name rename reparent rmdir };
+	class sock_file { create setattr unlink };
+	class chr_file { ioctl open read setattr write };
+	class tcp_socket name_connect;
+}
+
+#============= init_t ==============
+
+#!!!! This avc is allowed in the current policy
+allow init_t default_t:dir { rename reparent rmdir };
+
+#!!!! This avc is allowed in the current policy
+allow init_t default_t:file { create execute execute_no_trans lock map open read setattr unlink write };
+allow init_t default_t:file rename;
+
+#!!!! This avc is allowed in the current policy
+allow init_t default_t:lnk_file { create rename setattr unlink };
+allow init_t default_t:sock_file { create setattr unlink };
+
+#!!!! This avc is allowed in the current policy
+allow init_t devpts_t:chr_file { open setattr };
+
+#!!!! This avc is allowed in the current policy
+allow init_t http_port_t:tcp_socket name_connect;
+
+#!!!! This avc is allowed in the current policy
+allow init_t kvm_device_t:chr_file { read write };
+
+#!!!! This avc is allowed in the current policy
+#!!!! This av rule may have been overridden by an extended permission av rule
+allow init_t ptmx_t:chr_file { ioctl open read write };
+allow init_t snapperd_data_t:dir add_name;
+allow init_t snapperd_data_t:file { create open read setattr write };

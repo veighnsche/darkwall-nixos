@@ -1,0 +1,24 @@
+module nix-sandbox 1.0;
+
+require {
+    type init_t;
+    type default_t;
+    type user_home_t;
+    type snapperd_data_t;
+    class fifo_file { create open read write unlink getattr };
+    class dir { add_name remove_name write read };
+    class lnk_file { read getattr };
+    class file { read write create unlink getattr open };
+}
+
+# Allow init_t (nix sandbox) to work with fifo files in default_t context
+allow init_t default_t:fifo_file { create open read write unlink getattr };
+allow init_t default_t:dir { add_name remove_name write read };
+allow init_t default_t:file { read write create unlink getattr open };
+
+# Allow reading user home symlinks
+allow init_t user_home_t:lnk_file { read getattr };
+
+# Allow working with snapper data
+allow init_t snapperd_data_t:dir { remove_name write read };
+allow init_t snapperd_data_t:file { unlink };

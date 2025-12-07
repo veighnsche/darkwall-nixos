@@ -1,4 +1,5 @@
-# TEAM_426: Desktop environment module
+# TEAM_442: Desktop environment module
+# KDE Plasma desktop (niri will be added gradually)
 { config, lib, pkgs, ... }:
 
 {

@@ -42,6 +42,18 @@ vm-run:
     nix build .#nixosConfigurations.vm-test.config.system.build.vm
     ./result/bin/run-vm-test-vm
 
+# TEAM_442: Verify running VM via SSH
+vm-verify:
+    ./scripts/vm-verify.sh
+
+# TEAM_442: Build, run VM in background, wait for SSH, then verify
+vm-test:
+    nix build .#nixosConfigurations.vm-test.config.system.build.vm
+    @echo "Starting VM in background..."
+    ./result/bin/run-vm-test-vm &
+    @./scripts/wait-for-ssh.sh
+    ./scripts/vm-verify.sh
+
 # Build an ISO image for installation
 iso:
     nix build .#nixosConfigurations.vm-test.config.system.build.isoImage

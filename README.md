@@ -115,6 +115,17 @@ just home
 home-manager switch --flake .#vince@fedora
 ```
 
+#### Fedora SELinux Setup (One-time)
+
+Nix sandbox requires an SELinux policy on Fedora. Install once:
+
+```bash
+sudo semodule -i scripts/fedora/nix-sandbox.pp
+sudo systemctl restart nix-daemon
+```
+
+Verify: `semodule -l | grep nix-sandbox` should show the module.
+
 ## Commands (Justfile)
 
 | Command | Description |

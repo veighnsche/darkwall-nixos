@@ -1,0 +1,18 @@
+
+module nix-full 1.0;
+
+require {
+	type init_t;
+	type default_t;
+	class sock_file { create setattr unlink };
+	class file { append ioctl rename };
+}
+
+#============= init_t ==============
+allow init_t default_t:file { append ioctl };
+
+#!!!! This avc is allowed in the current policy
+allow init_t default_t:file rename;
+
+#!!!! This avc is allowed in the current policy
+allow init_t default_t:sock_file { create setattr unlink };

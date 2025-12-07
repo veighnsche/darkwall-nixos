@@ -19,17 +19,26 @@
     cores = 8;
     memorySize = 16 * 1024;  # 16GB in MB
     diskSize = 50 * 1024;    # 50GB in MB
+    # TEAM_442: Forward SSH for automated verification
+    forwardPorts = [
+      { from = "host"; host.port = 2222; guest.port = 22; }
+    ];
+    # TEAM_442: Use virtio-gpu for better graphics (needed for niri)
+    qemu.options = [
+      "-device virtio-vga-gl"
+      "-display gtk,gl=on"
+    ];
   };
 
   # Enable QEMU guest agent
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
 
-  # Autologin for testing (remove in production!)
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "vince";
-  };
+  # TEAM_442: Autologin disabled - testing SDDM login screen
+  # services.displayManager.autoLogin = {
+  #   enable = true;
+  #   user = "vince";
+  # };
 
   # Enable SSH with password auth for initial testing
   services.openssh.settings.PasswordAuthentication = lib.mkForce true;

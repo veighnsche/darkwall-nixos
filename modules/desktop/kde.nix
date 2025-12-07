@@ -1,7 +1,12 @@
 # TEAM_433: KDE Plasma desktop configuration
+# TEAM_442: Added niri compositor (Phase 2)
+# TEAM_443: Added wayland essentials for niri (Phase 4)
 { config, lib, pkgs, ... }:
 
 {
+  # TEAM_442: Phase 2 - Enable niri compositor
+  # This adds niri package and creates niri.desktop session file
+  programs.niri.enable = true;
   # Enable X11 and SDDM display manager
   services.xserver = {
     enable = true;
@@ -50,6 +55,18 @@
 
     # TEAM_433: XDG utilities for MIME/URL handling
     xdg-utils
+
+    # TEAM_443: Wayland essentials for niri (Phase 4)
+    waybar        # Status bar
+    rofi          # Launcher (krunner doesn't work in niri)
+    mako          # Notifications
+    libnotify     # notify-send command
+    swaybg        # Wallpaper
+    swaylock      # Screen lock
+    swayidle      # Idle management
+    wl-clipboard  # Clipboard
+    grim          # Screenshots
+    slurp         # Region selection
   ];
 
   # GTK integration for KDE
@@ -60,12 +77,10 @@
   # Electron apps use BROWSER env var and xdg-open for opening URLs
   # ════════════════════════════════════════════════════════════════
 
-  # XDG portal for Wayland screen sharing, file dialogs, etc.
+  # TEAM_442: XDG portal for KDE (reverted to simple config)
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
-    # TEAM_433: Don't use portal for xdg-open - it's broken on KDE
-    # The traditional xdg-open + BROWSER env var works better
     xdgOpenUsePortal = false;
   };
 
