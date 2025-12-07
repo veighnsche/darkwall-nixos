@@ -35,20 +35,14 @@ darkwall-nixos/
 │
 ├── modules/                  # Reusable NixOS modules
 │   ├── system/               # Base system (nix, boot, networking, locale)
-│   │   ├── default.nix
-│   │   ├── nix.nix
-│   │   ├── boot.nix
-│   │   ├── networking.nix
-│   │   └── locale.nix
-│   ├── desktop/              # Desktop environment
-│   │   ├── default.nix
-│   │   ├── kde.nix
-│   │   ├── audio.nix
-│   │   └── fonts.nix
-│   └── users/                # User definitions
-│       ├── default.nix
-│       ├── vince.nix
-│       └── guest.nix
+│   ├── desktop/              # Desktop environment (KDE, audio, fonts)
+│   ├── users/                # User definitions (links to home-manager)
+│   └── secrets/              # Agenix secrets configuration
+│
+├── secrets/                  # Encrypted secrets (agenix)
+│   ├── secrets.nix           # Key → secret mapping
+│   ├── ssh-key.age           # Encrypted SSH private key
+│   └── README.md             # Secrets documentation
 │
 ├── home/                     # Home Manager configs
 │   ├── vince/
@@ -237,6 +231,27 @@ home-manager = {
 
 3. Import in `modules/users/default.nix`
 
+## Secrets Management
+
+Secrets (SSH keys, API tokens) are managed with [agenix](https://github.com/ryantm/agenix).
+
+See [`secrets/README.md`](secrets/README.md) for full documentation.
+
+### Quick Reference
+
+```bash
+# Add a new host's key after NixOS install
+cat /etc/ssh/ssh_host_ed25519_key.pub  # Get the key
+# Add to secrets/secrets.nix
+nix-shell -p agenix && agenix -r       # Re-encrypt all secrets
+```
+
+### How It Works
+
+1. Secrets encrypted in `secrets/*.age` with age
+2. Decrypted at boot to `/run/agenix/` (tmpfs)
+3. Symlinked to user directories (e.g., `~/.ssh/id_ed25519`)
+
 ## Troubleshooting
 
 ### VM Won't Boot
@@ -261,6 +276,27 @@ just debug vm-test
 # or
 nixos-rebuild build --flake .#vm-test --show-trace
 ```
+
+### VM Symlinks Not Working (dotfiles missing)
+
+Dotfiles use `mkOutOfStoreSymlink` which creates symlinks to the host flake directory.
+The VM must mount this directory via 9P shared folder.
+
+**Fix:** Ensure `hosts/vm-test/default.nix` has:
+```nix
+virtualisation.vmVariant.virtualisation.sharedDirectories = {
+  flake-repo = {
+    source = "/home/vince/Projects/darkwall-nixos";
+    target = "/home/vince/Projects/darkwall-nixos";
+  };
+};
+```
+
+### Secrets Not Decrypting
+
+1. Check host key is in `secrets/secrets.nix`
+2. Re-encrypt: `agenix -r`
+3. Check `journalctl -u agenix` for errors
 
 ## References
 

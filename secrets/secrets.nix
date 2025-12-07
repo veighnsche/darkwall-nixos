@@ -1,58 +1,40 @@
-# TEAM_426: Program configurations for vince
-{ config, pkgs, lib, ... }:
-
-{
+# TEAM_446: Agenix secrets configuration
+# Maps secrets to the public keys that can decrypt them
+#
+# To add a new host:
+#   1. Get host SSH public key: cat /etc/ssh/ssh_host_ed25519_key.pub
+#   2. Add it below
+#   3. Re-encrypt all secrets: agenix -r
+#   4. Commit and push
+let
   # ════════════════════════════════════════════════════════════════
-  # Git
+  # User Keys (for encrypting from user machines)
   # ════════════════════════════════════════════════════════════════
-  programs.git = {
-    enable = true;
-    settings = {
-      user = {
-        name = "Vince Liem";
-        email = "vincepaul.liem@gmail.com";
-      };
-      init.defaultBranch = "main";
-      pull.rebase = true;
-      push.autoSetupRemote = true;
-      core.editor = "nvim";
-      # TEAM_448: Trust flake repo in VM (shared folder has different ownership)
-      safe.directory = "/home/vince/Projects/darkwall-nixos";
-    };
-  };
-
-  # Delta (git diff pager)
-  programs.delta = {
-    enable = true;
-    enableGitIntegration = true;
-    options = {
-      navigate = true;
-      side-by-side = true;
-      line-numbers = true;
-    };
-  };
+  # Vince's personal key - tied to identity, same across all machines
+  vince = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6lMXGI0/5HqCeMcO6V5Zt5v5w2NT1/yLBapxOvkIsx vincepaul.liem@gmail.com";
 
   # ════════════════════════════════════════════════════════════════
-  # Konsole (KDE terminal)
+  # Host SSH Keys (for decryption at activation time)
   # ════════════════════════════════════════════════════════════════
-  programs.konsole = {
-    enable = true;
-    defaultProfile = "Vince";
-    profiles = {
-      "Vince" = {
-        command = "${pkgs.zsh}/bin/zsh";
-        font = {
-          name = "Hack Nerd Font";
-          size = 11;
-        };
-      };
-    };
-  };
+  # Add host keys here after NixOS install:
+  #   cat /etc/ssh/ssh_host_ed25519_key.pub
+  #
+  # blep = "ssh-ed25519 AAAA... root@blep";
+  # vm-test = "ssh-ed25519 AAAA... root@vm-test";
 
   # ════════════════════════════════════════════════════════════════
-  # Firefox
+  # Key Groups
   # ════════════════════════════════════════════════════════════════
-  programs.firefox = {
-    enable = true;
-  };
+  # For now, only vince's key can decrypt (bootstrap phase)
+  # After hosts are set up, add them to allSystems
+  allUsers = [ vince ];
+  allSystems = [ ];  # Add host keys here after first boot
+  all = allUsers ++ allSystems;
+
+in {
+  # SSH private key for git operations
+  "ssh-key.age".publicKeys = all;
+  
+  # SSH public key (for convenience, could also be plaintext)
+  "ssh-key-pub.age".publicKeys = all;
 }

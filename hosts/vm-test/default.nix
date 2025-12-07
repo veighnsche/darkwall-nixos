@@ -90,4 +90,11 @@
     # For clipboard sharing in VM
     spice-vdagent
   ];
+
+  # TEAM_448: Set git safe.directory globally so nixos-rebuild works with shared folder
+  # The shared folder from host has different ownership inside VM
+  environment.etc."gitconfig".text = ''
+    [safe]
+      directory = /home/vince/Projects/darkwall-nixos
+  '';
 }

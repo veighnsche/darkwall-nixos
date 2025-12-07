@@ -7,6 +7,7 @@
     ../common           # Inherit all base config (KDE apps, essentials)
     ./shell.nix         # Power-user shell (zsh, starship)
     ./programs.nix      # Git, dev tools config
+    ./ssh.nix           # TEAM_446: SSH with agenix secrets
     ./darkwall-niri     # TEAM_443: Niri config (symlinked dotfiles)
   ];
 

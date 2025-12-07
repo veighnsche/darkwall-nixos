@@ -75,6 +75,19 @@ in {
   #   2. Create secrets/ssh-key.age encrypted with your age key
   #   3. Reference via age.secrets.ssh-key.file
 
+  # TEAM_448: Passwordless sudo for VM automation commands
+  # nixos-rebuild: enables `just vm-rebuild` without password
+  # poweroff: enables `just vm-stop` without password
+  security.sudo.extraRules = [{
+    users = [ "vince" ];
+    commands = [
+      { command = "/run/current-system/sw/bin/nixos-rebuild"; options = [ "NOPASSWD" ]; }
+      { command = "${pkgs.nixos-rebuild}/bin/nixos-rebuild"; options = [ "NOPASSWD" ]; }
+      { command = "/run/current-system/sw/bin/poweroff"; options = [ "NOPASSWD" ]; }
+      { command = "/run/current-system/sw/bin/reboot"; options = [ "NOPASSWD" ]; }
+    ];
+  }];
+
   # Link to Home Manager configuration
   home-manager.users.vince = import ../../home/vince;
 }

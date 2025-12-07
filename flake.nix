@@ -19,9 +19,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # TEAM_446: Agenix for secrets management
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, plasma-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, plasma-manager, agenix, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -39,6 +45,8 @@
 
       # Shared NixOS modules for all hosts
       sharedModules = [
+        # TEAM_446: Agenix for secrets management
+        agenix.nixosModules.default
         # Make home-manager available as NixOS module
         home-manager.nixosModules.home-manager
         {
@@ -57,6 +65,7 @@
         ./modules/system
         ./modules/desktop
         ./modules/users
+        ./modules/secrets
       ];
 
     in {

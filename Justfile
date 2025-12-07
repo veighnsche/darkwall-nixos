@@ -32,32 +32,58 @@ test host=default_host:
 # VM Commands
 # ════════════════════════════════════════════════════════════════════════════
 
+# TEAM_448: VM result path (outside shared folder to avoid symlink issues in VM)
+vm_result := "/tmp/darkwall-vm-result"
+
 # Build a QEMU VM image
 vm:
-    nix build .#nixosConfigurations.vm-test.config.system.build.vm
-    @echo "Run with: ./result/bin/run-vm-test-vm"
+    nix build .#nixosConfigurations.vm-test.config.system.build.vm -o {{vm_result}}
+    @echo "Run with: {{vm_result}}/bin/run-vm-test-vm"
 
-# Build and run the VM
+# Build and run the VM interactively (may use cached state)
 vm-run:
-    nix build .#nixosConfigurations.vm-test.config.system.build.vm
-    ./result/bin/run-vm-test-vm
+    nix build .#nixosConfigurations.vm-test.config.system.build.vm -o {{vm_result}}
+    {{vm_result}}/bin/run-vm-test-vm
+
+# TEAM_448: Build, run VM, and ensure fresh state (runs in background)
+vm-run-fresh:
+    nix build .#nixosConfigurations.vm-test.config.system.build.vm -o {{vm_result}}
+    @echo "Starting VM in background..."
+    {{vm_result}}/bin/run-vm-test-vm &
+    @./scripts/wait-for-ssh.sh
+    @echo "Rebuilding NixOS inside VM to ensure freshness..."
+    ssh -t -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 vince@localhost "sudo rm -rf /root/.cache/nix && sudo nixos-rebuild test --flake /home/vince/Projects/darkwall-nixos#vm-test"
+    @echo ""
+    @echo "═══════════════════════════════════════════════════════"
+    @echo "  VM is ready and FRESH"
+    @echo "  SSH: ssh -p 2222 vince@localhost"
+    @echo "  Stop: just vm-stop"
+    @echo "═══════════════════════════════════════════════════════"
 
 # TEAM_442: Verify running VM via SSH
 vm-verify:
     ./scripts/vm-verify.sh
 
+# TEAM_448: Rebuild NixOS inside running VM (picks up flake changes)
+vm-rebuild:
+    ssh -t -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 vince@localhost "sudo rm -rf /root/.cache/nix && sudo nixos-rebuild test --flake /home/vince/Projects/darkwall-nixos#vm-test"
+
+# TEAM_448: Stop the VM gracefully
+vm-stop:
+    ssh -t -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 vince@localhost "sudo poweroff" || true
+
 # TEAM_442: Build, run VM in background, wait for SSH, then verify
 vm-test:
-    nix build .#nixosConfigurations.vm-test.config.system.build.vm
+    nix build .#nixosConfigurations.vm-test.config.system.build.vm -o {{vm_result}}
     @echo "Starting VM in background..."
-    ./result/bin/run-vm-test-vm &
+    {{vm_result}}/bin/run-vm-test-vm &
     @./scripts/wait-for-ssh.sh
     ./scripts/vm-verify.sh
 
 # Build an ISO image for installation
 iso:
-    nix build .#nixosConfigurations.vm-test.config.system.build.isoImage
-    @echo "ISO available at: ./result/iso/"
+    nix build .#nixosConfigurations.vm-test.config.system.build.isoImage -o /tmp/darkwall-iso-result
+    @echo "ISO available at: /tmp/darkwall-iso-result/iso/"
 
 # ════════════════════════════════════════════════════════════════════════════
 # Home Manager Commands (for non-NixOS systems like Fedora)

@@ -1,10 +1,14 @@
 # TEAM_433: Windsurf dotfiles configuration
 # TEAM_443: Simplified to symlink entire workflows folder
+# TEAM_447: Fixed symlink path to use runtime repo location, not Nix store
 # Symlinks point to REPO (not store) for instant updates
-{ config, pkgs, lib, flakePath, ... }:
+{ config, pkgs, lib, ... }:
 
 let
-  dotfilesPath = "${flakePath}/home/common/darkwall-windsurf/dotfiles";
+  # TEAM_447: Use the actual runtime path where the repo is bootstrapped
+  # NOT flakePath (which resolves to /nix/store/...-source at build time)
+  repoPath = "/home/vince/Projects/darkwall-nixos";
+  dotfilesPath = "${repoPath}/home/common/darkwall-windsurf/dotfiles";
   mkSymlink = path: config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/${path}";
 in {
   home.packages = [ pkgs.darkwall-windsurf ];
